@@ -3,17 +3,17 @@
 
   const DATA = window.QUIZ_DATA || {};
   const MAPEL = [
-    { id: 'sejarah', nama: 'Sejarah' },
-    { id: 'pkn', nama: 'Pendidikan Pancasila' }
+    { id: 'sejarah', nama: 'Sejarah', ikon: '📜' },
+    { id: 'pkn', nama: 'Pendidikan Pancasila', ikon: '🦅' }
   ].filter(m => DATA[m.id]);
 
   const JUMLAH_PG = 10;
   const MODE = [
-    { id: 'pg', kunci: 'pg', nama: 'Pilihan ganda', ket: n => `${Math.min(JUMLAH_PG, n)} soal acak dari ${n}, langsung ada pembahasan` },
-    { id: 'kartu', kunci: 'flashcards', nama: 'Kartu hafalan', ket: n => `${n} kartu, ketuk untuk melihat jawaban` },
-    { id: 'urut', kunci: 'urutkan', nama: 'Urutkan', ket: n => `${n} set, susun ke urutan yang benar` },
-    { id: 'jodoh', kunci: 'jodohkan', nama: 'Menjodohkan', ket: n => `${n} set, pasangkan kiri dan kanan` },
-    { id: 'uraian', kunci: 'uraian', nama: 'Uraian', ket: n => `${n} soal, jawab dulu lalu cek poin kunci` }
+    { id: 'pg', kunci: 'pg', nama: 'Pilihan ganda', ikon: '✏️', ket: n => `${Math.min(JUMLAH_PG, n)} soal acak dari ${n}, langsung ada pembahasan` },
+    { id: 'kartu', kunci: 'flashcards', nama: 'Kartu hafalan', ikon: '🃏', ket: n => `${n} kartu, ketuk untuk melihat jawaban` },
+    { id: 'urut', kunci: 'urutkan', nama: 'Urutkan', ikon: '🔢', ket: n => `${n} set, susun ke urutan yang benar` },
+    { id: 'jodoh', kunci: 'jodohkan', nama: 'Menjodohkan', ikon: '🔗', ket: n => `${n} set, pasangkan kiri dan kanan` },
+    { id: 'uraian', kunci: 'uraian', nama: 'Uraian', ikon: '📝', ket: n => `${n} soal, jawab dulu lalu cek poin kunci` }
   ];
 
   const app = document.getElementById('app');
@@ -76,6 +76,9 @@
     }
     return e;
   }
+  function emo(e) {
+    return e ? el('span', { class: 'emo', 'aria-hidden': 'true' }, e) : null;
+  }
   function ganti(node, ...anak) {
     node.replaceChildren(...anak.flat().filter(a => a != null && a !== false));
   }
@@ -91,7 +94,7 @@
     app.replaceChildren(
       el('header', { class: 'atas' },
         o.kembali ? el('a', { class: 'kembali', href: '#/' }, '‹ Daftar latihan') : null,
-        el('h1', { class: o.besar ? 'judul besar' : 'judul' }, o.judul),
+        el('h1', { class: o.besar ? 'judul besar' : 'judul' }, emo(o.ikon), o.judul),
         o.sub ? el('p', { class: 'sub' }, o.sub) : null,
         o.ekstra || null,
         o.maju ? el('div', { class: 'maju' },
@@ -106,7 +109,7 @@
   function hasil(m, mode, n, t, satuan, tambahan, ulang) {
     simpan(`${m.id}/${mode.id}`, n, t);
     const s = muat()[`${m.id}/${mode.id}`];
-    layar({ kembali: true, judul: 'Hasil', sub: `${m.nama}, ${mode.nama.toLowerCase()}` },
+    layar({ kembali: true, judul: 'Hasil', ikon: '🏁', sub: `${m.nama}, ${mode.nama.toLowerCase()}` },
       el('p', { class: 'skor' },
         el('span', { class: 'skor-angka' }, `${n}/${t}`),
         el('span', { class: 'skor-ket' }, satuan)),
@@ -120,17 +123,17 @@
   /* ---------- beranda ---------- */
   function beranda() {
     const skor = muat();
-    layar({ judul: 'Latihan ASAS', besar: true, sub: 'Kelas 12, semester ganjil. Pilih latihan, kerjakan di HP, ulangi sesukamu.', ekstra: tombolTema() },
+    layar({ judul: 'Latihan ASAS', ikon: '🎯', besar: true, sub: 'Kelas 12, semester ganjil. Pilih latihan, kerjakan di HP, ulangi sesukamu.', ekstra: tombolTema() },
       el('div', { class: 'tanda', 'aria-hidden': 'true' }),
       MAPEL.map(m => el('section', { class: 'mapel' },
-        el('h2', null, m.nama),
+        el('h2', null, emo(m.ikon), m.nama),
         el('ul', { class: 'daftar' },
           MODE.filter(md => (DATA[m.id][md.kunci] || []).length).map(md => {
             const s = skor[`${m.id}/${md.id}`];
             return el('li', null,
               el('a', { class: 'baris', href: `#/${m.id}/${md.id}` },
                 el('span', { class: 'baris-teks' },
-                  el('strong', null, md.nama),
+                  el('strong', null, emo(md.ikon), md.nama),
                   el('span', { class: 'ket' }, md.ket(DATA[m.id][md.kunci].length))),
                 s ? el('span', { class: 'terbaik' }, `Terbaik ${s.n}/${s.t}`) : null));
           })))),
@@ -148,7 +151,7 @@
 
     const selesai = () => hasil(m, mode, benar, soal.length, 'jawaban benar',
       salah.length ? [
-        el('h2', { class: 'bagian' }, 'Yang perlu dipelajari lagi'),
+        el('h2', { class: 'bagian' }, emo('📌'), 'Yang perlu dipelajari lagi'),
         el('ul', { class: 'ulasan' }, salah.map(s => el('li', null,
           el('p', { class: 'q' }, s.q.soal),
           el('p', { class: 'salah' }, `Pilihanmu: ${s.pilih}`),
@@ -186,7 +189,7 @@
         lihat(lanjut);
       }
 
-      layar({ kembali: true, judul: mode.nama, sub: m.nama, maju: { kini: i, max: soal.length, label: `Soal ${i + 1} dari ${soal.length}` } },
+      layar({ kembali: true, judul: mode.nama, ikon: mode.ikon, sub: m.nama, maju: { kini: i, max: soal.length, label: `Soal ${i + 1} dari ${soal.length}` } },
         q.topik ? el('p', { class: 'topik' }, q.topik) : null,
         q.stimulus ? el('p', { class: 'stimulus' }, q.stimulus) : null,
         el('h2', { class: 'soal' }, q.soal),
@@ -225,7 +228,7 @@
         lihat(aksi);
       } }, sisi, isi, petunjuk);
 
-      layar({ kembali: true, judul: mode.nama, sub: m.nama, maju: { kini: hafal, max: semua.length, label: `Hafal ${hafal} dari ${semua.length} kartu` } },
+      layar({ kembali: true, judul: mode.nama, ikon: mode.ikon, sub: m.nama, maju: { kini: hafal, max: semua.length, label: `Hafal ${hafal} dari ${semua.length} kartu` } },
         k.topik ? el('p', { class: 'topik' }, k.topik) : null,
         kartu, aksi);
     };
@@ -267,7 +270,7 @@
             el('button', { type: 'button', class: 'utama', onclick: () => { si++; tampil(); } },
               si === sets.length - 1 ? 'Lihat hasil' : 'Set berikutnya'))
           : el('div', null,
-            sisa.length ? el('h3', { class: 'kolam-judul' }, 'Pilihan') : null,
+            sisa.length ? el('h3', { class: 'kolam-judul' }, emo('👇'), 'Pilihan') : null,
             el('div', { class: 'kolam' }, sisa.map(x => el('button', { type: 'button', class: 'keping',
               onclick: () => { taruh.push(x); gambar(); } }, s.urutan[x]))),
             el('div', { class: 'aksi' },
@@ -280,7 +283,7 @@
         ganti(badan,slot, bawah);
       };
 
-      layar({ kembali: true, judul: mode.nama, sub: m.nama, maju: { kini: si, max: sets.length, label: `Set ${si + 1} dari ${sets.length}` } },
+      layar({ kembali: true, judul: mode.nama, ikon: mode.ikon, sub: m.nama, maju: { kini: si, max: sets.length, label: `Set ${si + 1} dari ${sets.length}` } },
         el('h2', { class: 'soal' }, s.judul),
         el('p', { class: 'petunjuk' }, s.petunjuk || 'Ketuk pilihan satu per satu sesuai urutannya. Ketuk lagi untuk mengembalikan.'),
         badan);
@@ -353,7 +356,7 @@
         lihat(lanjut);
       }
 
-      layar({ kembali: true, judul: mode.nama, sub: m.nama, maju: { kini: si, max: sets.length, label: `Set ${si + 1} dari ${sets.length}` } },
+      layar({ kembali: true, judul: mode.nama, ikon: mode.ikon, sub: m.nama, maju: { kini: si, max: sets.length, label: `Set ${si + 1} dari ${sets.length}` } },
         el('h2', { class: 'soal' }, s.judul),
         status,
         el('div', { class: 'jodoh' },
@@ -385,13 +388,13 @@
           return { input, node: el('label', { class: 'centang', for: `poin-${k}` }, input, el('span', null, p)) };
         });
         ganti(badan,
-          tulisan ? el('h3', { class: 'bagian' }, 'Jawabanmu') : null,
+          tulisan ? el('h3', { class: 'bagian' }, emo('✍️'), 'Jawabanmu') : null,
           tulisan ? el('p', { class: 'jawabanku' }, tulisan) : null,
-          el('h3', { class: 'bagian' }, 'Poin kunci'),
+          el('h3', { class: 'bagian' }, emo('🔑'), 'Poin kunci'),
           el('p', { class: 'petunjuk' }, 'Centang poin yang sudah ada di jawabanmu.'),
           el('div', { class: 'centang-daftar' }, centang.map(c => c.node)),
           jumlah,
-          el('h3', { class: 'bagian' }, 'Contoh jawaban'),
+          el('h3', { class: 'bagian' }, emo('💡'), 'Contoh jawaban'),
           el('p', { class: 'contoh' }, q.contoh),
           el('div', { class: 'aksi' },
             el('button', { type: 'button', class: 'utama', onclick: () => {
@@ -408,7 +411,7 @@
         kotak,
         el('button', { type: 'button', class: 'utama', onclick: cek }, 'Lihat poin kunci'));
 
-      layar({ kembali: true, judul: mode.nama, sub: m.nama, maju: { kini: i, max: soal.length, label: `Soal ${i + 1} dari ${soal.length}` } },
+      layar({ kembali: true, judul: mode.nama, ikon: mode.ikon, sub: m.nama, maju: { kini: i, max: soal.length, label: `Soal ${i + 1} dari ${soal.length}` } },
         q.topik ? el('p', { class: 'topik' }, q.topik) : null,
         el('h2', { class: 'soal' }, q.soal),
         badan);

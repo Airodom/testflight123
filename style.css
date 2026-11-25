@@ -99,6 +99,11 @@ button { font: inherit; color: inherit; }
 .maju progress::-webkit-progress-value { background: var(--ink); }
 .maju progress::-moz-progress-bar { background: var(--ink); }
 
+.emo {
+  margin-right: 0.4em; font-style: normal; font-weight: 400;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
 .tema {
   margin-top: 0.875rem; min-height: 2.75rem; padding: 0.375rem 1rem;
   background: var(--paper); color: var(--graphite);
