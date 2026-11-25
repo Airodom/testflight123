@@ -19,6 +19,34 @@
   const app = document.getElementById('app');
   const KUNCI_SIMPAN = 'latihan-asas-v1';
 
+  /* ---------- tema: otomatis (ikut HP), terang, gelap ---------- */
+  const KUNCI_TEMA = 'latihan-asas-tema';
+  const TEMA = ['auto', 'light', 'dark'];
+  const NAMA_TEMA = { auto: 'Otomatis', light: 'Terang', dark: 'Gelap' };
+  let tema = 'auto';
+  try {
+    const t = localStorage.getItem(KUNCI_TEMA);
+    if (TEMA.includes(t)) tema = t;
+  } catch (e) { /* private mode: stay on auto */ }
+
+  function pasangTema(t) {
+    tema = t;
+    const akar = document.documentElement;
+    if (t === 'auto') akar.removeAttribute('data-theme'); else akar.setAttribute('data-theme', t);
+    try {
+      if (t === 'auto') localStorage.removeItem(KUNCI_TEMA); else localStorage.setItem(KUNCI_TEMA, t);
+    } catch (e) { /* not saved, still applied for this visit */ }
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', getComputedStyle(akar).getPropertyValue('--ink').trim());
+  }
+  function tombolTema() {
+    const b = el('button', { type: 'button', class: 'tema', onclick: () => {
+      pasangTema(TEMA[(TEMA.indexOf(tema) + 1) % TEMA.length]);
+      b.textContent = `Tampilan: ${NAMA_TEMA[tema]}`;
+    } }, `Tampilan: ${NAMA_TEMA[tema]}`);
+    return b;
+  }
+
   /* ---------- helpers ---------- */
   function muat() {
     try { return JSON.parse(localStorage.getItem(KUNCI_SIMPAN)) || {}; } catch (e) { return {}; }
@@ -48,6 +76,9 @@
     }
     return e;
   }
+  function ganti(node, ...anak) {
+    node.replaceChildren(...anak.flat().filter(a => a != null && a !== false));
+  }
   function acak(a) {
     const b = a.slice();
     for (let i = b.length - 1; i > 0; i--) {
@@ -62,6 +93,7 @@
         o.kembali ? el('a', { class: 'kembali', href: '#/' }, '‹ Daftar latihan') : null,
         el('h1', { class: o.besar ? 'judul besar' : 'judul' }, o.judul),
         o.sub ? el('p', { class: 'sub' }, o.sub) : null,
+        o.ekstra || null,
         o.maju ? el('div', { class: 'maju' },
           el('span', null, o.maju.label),
           el('progress', { max: o.maju.max, value: o.maju.kini, 'aria-label': o.maju.label })) : null),
@@ -88,7 +120,7 @@
   /* ---------- beranda ---------- */
   function beranda() {
     const skor = muat();
-    layar({ judul: 'Latihan ASAS', besar: true, sub: 'Kelas 12, semester ganjil. Pilih latihan, kerjakan di HP, ulangi sesukamu.' },
+    layar({ judul: 'Latihan ASAS', besar: true, sub: 'Kelas 12, semester ganjil. Pilih latihan, kerjakan di HP, ulangi sesukamu.', ekstra: tombolTema() },
       el('div', { class: 'tanda', 'aria-hidden': 'true' }),
       MAPEL.map(m => el('section', { class: 'mapel' },
         el('h2', null, m.nama),
@@ -147,7 +179,7 @@
         });
         const lanjut = el('button', { type: 'button', class: 'utama', onclick: () => { i++; tampil(); } },
           i === soal.length - 1 ? 'Lihat hasil' : 'Soal berikutnya');
-        umpan.replaceChildren(
+        ganti(umpan,
           el('p', { class: betul ? 'vonis ya' : 'vonis tidak' }, betul ? 'Benar.' : 'Belum tepat.'),
           el('p', null, q.pembahasan),
           lanjut);
@@ -245,7 +277,7 @@
                 gambar();
                 lihat(badan.querySelector('.umpan'));
               } }, 'Periksa urutan')));
-        badan.replaceChildren(slot, bawah);
+        ganti(badan,slot, bawah);
       };
 
       layar({ kembali: true, judul: mode.nama, sub: m.nama, maju: { kini: si, max: sets.length, label: `Set ${si + 1} dari ${sets.length}` } },
@@ -314,7 +346,7 @@
         if (!salah) tanpaSalah++;
         const lanjut = el('button', { type: 'button', class: 'utama', onclick: () => { si++; tampil(); } },
           si === sets.length - 1 ? 'Lihat hasil' : 'Set berikutnya');
-        umpan.replaceChildren(
+        ganti(umpan,
           el('p', { class: 'vonis ya' }, salah ? 'Semua sudah berpasangan.' : 'Sempurna, tanpa salah pasang.'),
           salah ? el('p', null, `Salah pasang ${salah} kali di set ini. Angka pada kotak menunjukkan pasangannya.`) : null,
           lanjut);
@@ -352,7 +384,7 @@
           } });
           return { input, node: el('label', { class: 'centang', for: `poin-${k}` }, input, el('span', null, p)) };
         });
-        badan.replaceChildren(
+        ganti(badan,
           tulisan ? el('h3', { class: 'bagian' }, 'Jawabanmu') : null,
           tulisan ? el('p', { class: 'jawabanku' }, tulisan) : null,
           el('h3', { class: 'bagian' }, 'Poin kunci'),
@@ -394,5 +426,6 @@
     else beranda();
   }
   window.addEventListener('hashchange', rute);
+  pasangTema(tema);
   rute();
 })();

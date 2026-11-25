@@ -1,8 +1,9 @@
 /* Latihan ASAS: the look borrows from the LJK answer sheet (rose form ink, 2B graphite). */
 :root {
   color-scheme: light;
-  --paper: #ffffff;
+  --paper: #fafbfc;
   --desk: #e9edf1;
+  --panel: #eff2f5;
   --ink: #c2255c;        /* LJK form ink */
   --ink-soft: #fbe6ee;
   --graphite: #23262b;   /* 2B pencil */
@@ -16,10 +17,44 @@
   --display: "Barlow Condensed", "Barlow", system-ui, sans-serif;
 }
 
+/* Dark: the same sheet at night. Follows the phone unless the student picks a theme. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #1b1e24;
+    --desk: #111317;
+    --panel: #262a33;
+    --ink: #ff7aa5;
+    --ink-soft: #3a2230;
+    --graphite: #e8eaee;
+    --muted: #a3aab5;
+    --line: #3a404b;
+    --ok: #5fd08f;
+    --ok-soft: #1c3528;
+    --no: #f0a35e;
+    --no-soft: #3b2a18;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #1b1e24;
+  --desk: #111317;
+  --panel: #262a33;
+  --ink: #ff7aa5;
+  --ink-soft: #3a2230;
+  --graphite: #e8eaee;
+  --muted: #a3aab5;
+  --line: #3a404b;
+  --ok: #5fd08f;
+  --ok-soft: #1c3528;
+  --no: #f0a35e;
+  --no-soft: #3b2a18;
+}
+
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; font-size: 112.5%; }
 body {
   margin: 0;
   background: var(--desk);
@@ -64,6 +99,13 @@ button { font: inherit; color: inherit; }
 .maju progress::-webkit-progress-value { background: var(--ink); }
 .maju progress::-moz-progress-bar { background: var(--ink); }
 
+.tema {
+  margin-top: 0.875rem; min-height: 2.75rem; padding: 0.375rem 1rem;
+  background: var(--paper); color: var(--graphite);
+  border: 1.5px solid var(--line); border-radius: 2rem;
+  font-size: 0.9375rem; font-weight: 500; cursor: pointer;
+}
+
 /* LJK timing marks */
 .tanda {
   height: 0.625rem;
@@ -99,7 +141,7 @@ button { font: inherit; color: inherit; }
 .topik { color: var(--ink); font-weight: 600; font-size: 0.875rem; margin-bottom: 0.5rem; }
 .stimulus {
   margin-bottom: 0.875rem; padding: 0.75rem 0.875rem;
-  background: #f4f6f8; border-left: 4px solid var(--graphite);
+  background: var(--panel); border-left: 4px solid var(--graphite);
 }
 .soal { font: 600 1.1875rem/1.4 var(--body); margin-bottom: 1rem; }
 .petunjuk { color: var(--muted); margin-bottom: 1rem; }
@@ -110,7 +152,7 @@ button { font: inherit; color: inherit; }
   min-height: 3rem; padding: 0.625rem 1.25rem; border-radius: 0.5rem;
   font-weight: 600; text-decoration: none; cursor: pointer;
 }
-.utama { background: var(--ink); color: #fff; border: 2px solid var(--ink); }
+.utama { background: var(--ink); color: var(--paper); border: 2px solid var(--ink); }
 .utama:disabled { background: var(--line); border-color: var(--line); color: var(--muted); cursor: default; }
 .kedua { background: var(--paper); color: var(--graphite); border: 2px solid var(--graphite); }
 .aksi { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.25rem; }
@@ -137,9 +179,9 @@ button { font: inherit; color: inherit; }
   transition: background-color 0.18s, color 0.18s, border-color 0.18s;
 }
 .opsi-teks { padding-top: 0.25rem; }
-.opsi.dipilih .bulat { background: var(--graphite); border-color: var(--graphite); color: #fff; }
+.opsi.dipilih .bulat { background: var(--graphite); border-color: var(--graphite); color: var(--paper); }
 .opsi.ya { background: var(--ok-soft); border-color: var(--ok); }
-.opsi.ya .bulat { background: var(--ok); border-color: var(--ok); color: #fff; }
+.opsi.ya .bulat { background: var(--ok); border-color: var(--ok); color: var(--paper); }
 .opsi.tidak { background: var(--no-soft); border-color: var(--no); }
 .cap { grid-column: 2; margin-top: 0.25rem; font-size: 0.8125rem; font-weight: 600; }
 .opsi.ya .cap { color: var(--ok); }
@@ -167,8 +209,8 @@ button { font: inherit; color: inherit; }
   display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%;
   border: 2px solid var(--ink); color: var(--ink); font: 600 1rem/1 var(--display);
 }
-.slot-li.ya::before { background: var(--ok); border-color: var(--ok); color: #fff; }
-.slot-li.tidak::before { background: var(--no); border-color: var(--no); color: #fff; }
+.slot-li.ya::before { background: var(--ok); border-color: var(--ok); color: var(--paper); }
+.slot-li.tidak::before { background: var(--no); border-color: var(--no); color: var(--paper); }
 .slot-kosong {
   min-height: 2.875rem; display: flex; align-items: center; padding: 0 0.75rem;
   border: 1.5px dashed var(--line); border-radius: 0.5rem; color: var(--muted); font-size: 0.875rem;
@@ -192,13 +234,13 @@ button { font: inherit; color: inherit; }
   background: var(--paper); border: 1.5px solid var(--graphite); border-radius: 0.5rem;
   font-size: 0.9375rem; line-height: 1.3; cursor: pointer;
 }
-.kotak[aria-pressed="true"] { background: var(--graphite); color: #fff; }
+.kotak[aria-pressed="true"] { background: var(--graphite); color: var(--paper); }
 .kotak.ya { background: var(--ok-soft); border-color: var(--ok); }
 .kotak.tidak { background: var(--no-soft); border-color: var(--no); }
 .kotak:disabled { color: inherit; opacity: 1; cursor: default; }
 .nomor {
   display: inline-grid; place-items: center; width: 1.375rem; height: 1.375rem; margin-right: 0.375rem;
-  border-radius: 50%; background: var(--ok); color: #fff; font: 600 0.8125rem/1 var(--display); vertical-align: 0.05em;
+  border-radius: 50%; background: var(--ok); color: var(--paper); font: 600 0.8125rem/1 var(--display); vertical-align: 0.05em;
 }
 
 /* ---------- uraian ---------- */
@@ -208,7 +250,7 @@ textarea {
   border: 1.5px solid var(--graphite); border-radius: 0.5rem;
   font: inherit; color: inherit; background: var(--paper); resize: vertical;
 }
-.jawabanku { margin-bottom: 0.5rem; padding: 0.625rem 0.875rem; background: #f4f6f8; border-left: 4px solid var(--graphite); white-space: pre-wrap; }
+.jawabanku { margin-bottom: 0.5rem; padding: 0.625rem 0.875rem; background: var(--panel); border-left: 4px solid var(--graphite); white-space: pre-wrap; }
 .centang-daftar { display: grid; gap: 0.5rem; }
 .centang {
   display: grid; grid-template-columns: 1.5rem 1fr; column-gap: 0.625rem; align-items: start;
