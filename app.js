@@ -79,6 +79,11 @@
   function emo(e) {
     return e ? el('span', { class: 'emo', 'aria-hidden': 'true' }, e) : null;
   }
+  function uraikan(v, kelas) {
+    if (v == null || v === '') return null;
+    if (Array.isArray(v)) return el('ul', { class: 'butir-daftar' + (kelas ? ' ' + kelas : '') }, v.map(t => el('li', null, t)));
+    return el('p', kelas ? { class: kelas } : null, v);
+  }
   function ganti(node, ...anak) {
     node.replaceChildren(...anak.flat().filter(a => a != null && a !== false));
   }
@@ -156,7 +161,7 @@
           el('p', { class: 'q' }, s.q.soal),
           el('p', { class: 'salah' }, `Pilihanmu: ${s.pilih}`),
           el('p', { class: 'benar' }, `Jawaban benar: ${s.q.opsi[s.q.jawaban]}`),
-          el('p', null, s.q.pembahasan))))
+          uraikan(s.q.pembahasan))))
       ] : el('p', null, 'Semua benar. Coba set soal berikutnya.'),
       () => mulaiPG(m, mode));
 
@@ -184,7 +189,7 @@
           i === soal.length - 1 ? 'Lihat hasil' : 'Soal berikutnya');
         ganti(umpan,
           el('p', { class: betul ? 'vonis ya' : 'vonis tidak' }, betul ? 'Benar.' : 'Belum tepat.'),
-          el('p', null, q.pembahasan),
+          uraikan(q.pembahasan),
           lanjut);
         lihat(lanjut);
       }
@@ -222,7 +227,12 @@
         balik = !balik;
         kartu.classList.toggle('balik', balik);
         sisi.textContent = balik ? 'Jawaban' : 'Pertanyaan';
-        isi.textContent = balik ? k.belakang : k.depan;
+        const v = balik ? k.belakang : k.depan;
+        const berdaftar = Array.isArray(v);
+        isi.classList.toggle('berdaftar', berdaftar);
+        ganti(isi, berdaftar
+          ? el('span', { class: k.nomor ? 'kartu-daftar bernomor' : 'kartu-daftar' }, v.map(t => el('span', { class: 'kartu-butir' }, t)))
+          : v);
         petunjuk.textContent = balik ? 'Ketuk kartu untuk melihat pertanyaan lagi' : 'Ketuk kartu untuk melihat jawaban';
         aksi.hidden = false;
         lihat(aksi);
@@ -264,9 +274,12 @@
         const bawah = diperiksa
           ? el('div', { class: 'umpan', 'aria-live': 'polite' },
             el('p', { class: semuaBenar ? 'vonis ya' : 'vonis tidak' }, semuaBenar ? 'Urutan benar.' : 'Belum tepat.'),
-            semuaBenar ? null : el('p', null, 'Urutan yang benar:'),
-            semuaBenar ? null : el('ol', { class: 'benar-daftar' }, s.urutan.map(t => el('li', null, t))),
-            s.pembahasan ? el('p', null, s.pembahasan) : null,
+            s.rincian
+              ? [el('p', null, semuaBenar ? 'Rinciannya:' : 'Urutan yang benar:'),
+                el('ol', { class: 'benar-daftar' }, s.rincian.map(t => el('li', null, t)))]
+              : [semuaBenar ? null : el('p', null, 'Urutan yang benar:'),
+                semuaBenar ? null : el('ol', { class: 'benar-daftar' }, s.urutan.map(t => el('li', null, t)))],
+            uraikan(s.pembahasan),
             el('button', { type: 'button', class: 'utama', onclick: () => { si++; tampil(); } },
               si === sets.length - 1 ? 'Lihat hasil' : 'Set berikutnya'))
           : el('div', null,
@@ -395,7 +408,7 @@
           el('div', { class: 'centang-daftar' }, centang.map(c => c.node)),
           jumlah,
           el('h3', { class: 'bagian' }, emo('💡'), 'Contoh jawaban'),
-          el('p', { class: 'contoh' }, q.contoh),
+          uraikan(q.contoh, 'contoh'),
           el('div', { class: 'aksi' },
             el('button', { type: 'button', class: 'utama', onclick: () => {
               dapat += centang.filter(c => c.input.checked).length;
@@ -413,6 +426,7 @@
 
       layar({ kembali: true, judul: mode.nama, ikon: mode.ikon, sub: m.nama, maju: { kini: i, max: soal.length, label: `Soal ${i + 1} dari ${soal.length}` } },
         q.topik ? el('p', { class: 'topik' }, q.topik) : null,
+        q.stimulus ? el('p', { class: 'stimulus' }, q.stimulus) : null,
         el('h2', { class: 'soal' }, q.soal),
         badan);
     };
